@@ -111,6 +111,7 @@ async def refers_handler(message: types.Message):
                                                 f'Твой доход от рефки: 0 $\n\n'
                                                 f'Ссылка: https://t.me/lessons_test_test_bot?start={message.from_user.id}')
 
+
 @dp.callback_query(F.data == 'st_profile')
 async def profile_handler(message: types.Message):
     global photo_menu
