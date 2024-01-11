@@ -125,6 +125,7 @@ async def profile_handler(message: types.Message):
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
 
 
+
 @dp.callback_query(F.data == 'about')
 async def about_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'{text_about_as}', reply_markup=back_menu)
