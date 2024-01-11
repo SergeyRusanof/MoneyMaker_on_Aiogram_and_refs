@@ -130,6 +130,10 @@ async def about_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'{text_about_as}', reply_markup=back_menu)
 
 
+@dp.callback_query(F.data == 'all_users')
+async def all_users_handler(message: types.Message):
+    await bot.send_message(message.from_user.id, 'привет')
+
 @dp.message(F.photo)
 async def all_photo(message: types.Message):
     id = message.photo[-1].file_id
