@@ -99,6 +99,7 @@ async def balance_up_handler(message: types.Message):
                          f'После оплаты отправьте скриншот и свой id админу бота. После проверки в профиле будет виден баланс.\nАдмин - @sergeyrusanof - это живой, реальный человек поэтому ответ в течении 3-х часов в рабочее время.', parse_mode='MARKDOWN')
 
 
+
 @dp.callback_query(F.data == 'ref_system')
 async def refers_handler(message: types.Message):
     con = sqlite3.connect('users.db')
