@@ -144,14 +144,11 @@ async def all_photo(message: types.Message):
     await bot.send_message(message.from_user.id, 'Спасибо!')
 
 
-@dp.message(F.text)
-async def all_text(message: types.Message):
-    await bot.send_message(message.from_user.id, 'Спасибо!')
 
 
 
 
-@dp.message()
+@dp.message(F.text == '/adm')
 async def adm_handler(message: types.Message):
     if message.from_user.id == ADMIN:
         await bot.send_message(message.from_user.id, 'Привет АДМИН!', reply_markup=for_admin_menu)
