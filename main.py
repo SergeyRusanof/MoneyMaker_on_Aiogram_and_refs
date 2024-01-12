@@ -41,11 +41,11 @@ async def start(message: types.Message):
         if referer_id and referer_id != str(message.from_user.id):
             is_refers(message, message.from_user.id, referer_id)
             global photo_start
-            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпищшись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
+            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
                                  reply_markup=start_menu)
             await message.delete()
         else:
-            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпищшись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
+            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
                                  reply_markup=start_menu)
             await message.delete()
 
@@ -142,9 +142,6 @@ async def all_photo(message: types.Message):
     id = message.photo[-1].file_id
     print(id)
     await bot.send_message(message.from_user.id, 'Спасибо!')
-
-
-
 
 
 
