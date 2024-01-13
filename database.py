@@ -25,3 +25,8 @@ class DataBase:
     def add_data_user(self, user_id, user_name, balance, rbalance, btc, eth, trc, bep, income):
         with self.conn:
             result = self.cursor.execute('INSERT INTO users (user_id, user_name, balance, rbalance, btc, eth, trc, bep, income) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (user_id, user_name, balance, rbalance, btc, eth, trc, bep, income))
+
+    def profile_data(self, user_id):
+        with self.conn:
+            result = self.cursor.execute('SELECT * FROM users WHERE user_id=?', (user_id,)).fetchall()[0]
+            return result

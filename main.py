@@ -117,10 +117,8 @@ async def refers_handler(message: types.Message):
 @dp.callback_query(F.data == 'st_profile')
 async def profile_handler(message: types.Message):
     global photo_menu
-    con = sqlite3.connect('users.db')
-    cur = con.cursor()
-    cur.execute('SELECT * FROM referal WHERE referer_id=?', (message.from_user.id,))
-    count = cur.fetchall()
+    data = db.profile_data(message.from_user.id)
+    print(data)
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n'
                                                                f'<i>id {message.from_user.id}</i>\n\n'
                                                                f'<i>Баланс 0 $</i>\n\n'
