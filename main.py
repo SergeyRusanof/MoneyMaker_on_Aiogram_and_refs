@@ -6,20 +6,25 @@ from aiogram.client import bot
 from aiogram.filters import CommandStart
 from menu import *
 from about_as import *
-import random
+from capcha import generate_random_number
 from config import TOKEN, ADMIN
 from database import *
 from aiocron import crontab
 
 
+# CONNECT
 bot = Bot(TOKEN)
 dp = Dispatcher()
 db = DataBase('users.db')
+
+# CREATE DATABASE
 con = sqlite3.connect('users.db')
 cur = con.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS referal (id INTEGER PRIMARY KEY, user_id INTEGER, referer_id INTEGER)')
 cur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, user_id INTEGER, user_name TEXT, balance INTEGER, rbalance INTEGER, income INTEGER)")
 con.commit()
+
+# GLOBALS
 photo_start = 'AgACAgEAAxkBAAIQWmWZfMhUvQmOMOef0Xwqmn-uEIrdAALfrDEbY_rRRERg27ZmOrWnAQADAgADeQADNAQ'
 photo_menu = 'AgACAgEAAxkBAAIQVmWZfAgojhO9PE8sTGmGh60_ajBQAALbrDEbY_rRRI6fkVizLFnEAQADAgADeQADNAQ'
 photo_balance = 'AgACAgEAAxkBAAIQvmWaXdgRMUj2h7S6ilQmddZD9omZAAIerDEbYpjQROjvSFOmFZ5oAQADAgADeQADNAQ'
@@ -121,7 +126,7 @@ async def profile_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n'
                                                                f'<i>id {message.from_user.id}</i>\n\n'
                                                                f'<i>Баланс {data[3]} $</i>\n\n'
-                                                               f'<i>Доход за сутки: {data[4]} $</i>\n\n'
+                                                               f'<i>Доход за сутки: {data[4]} %</i>\n\n'
                                                                f'<i>Рефералы: {count} чел. 0 $</i>\n\n'
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
 
@@ -149,9 +154,11 @@ async def adm_handler(message: types.Message):
     if message.from_user.id == ADMIN:
         await bot.send_message(message.from_user.id, 'Привет АДМИН!', reply_markup=for_admin_menu)
 
-
-async def income_every_day() -> None:
-    pass
+@dp.callback_query(F.data == 'change_balance')
+async def income_every_day(message: types.Message):
+    amount = generate_random_number()
+    db.all_balance(amount)
+    await bot.send_message(ADMIN, f'Баланс увеличен на {amount}')
 
 
 

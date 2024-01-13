@@ -24,7 +24,7 @@ class DataBase:
 
     def all_balance(self, amount):
         with self.conn:
-            result = self.cursor.execute('UPDATE users SET balance=?', (amount,))
+            result = self.cursor.execute('UPDATE users SET balance=balance + ?', (amount,))
 
 
 
