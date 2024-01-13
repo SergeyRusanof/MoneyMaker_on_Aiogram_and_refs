@@ -20,3 +20,8 @@ class DataBase:
     def count_ref(self, user_id):
         with self.conn:
             return self.cursor.execute('SELECT COUNT (id) as count FROM refs WHERE user_id=?', (user_id,)).fetchone()[0]
+
+
+    def add_data_user(self, user_id, user_name, balance, rbalance, btc, eth, trc, bep, income):
+        with self.conn:
+            result = self.cursor.execute('INSERT INTO users (user_id, user_name, balance, rbalance, btc, eth, trc, bep, income) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', (user_id, user_name, balance, rbalance, btc, eth, trc, bep, income))

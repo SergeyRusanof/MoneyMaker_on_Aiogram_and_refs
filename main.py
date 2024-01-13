@@ -106,7 +106,7 @@ async def refers_handler(message: types.Message):
     cur = con.cursor()
     cur.execute('SELECT * FROM referal WHERE referer_id=?', (message.from_user.id,))
     count = cur.fetchall()
-    await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}.\n\n\n'
+    await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}.\nТы получаешь вознаграждение - 10% от суммы пополнений твоих рефералов.\n\n'
                                                 f'Перешли: {len(count)} реферала.\n\n'
                                                 f'Твой доход от рефки: 0 $\n\n'
                                                 f'Ссылка: https://t.me/lessons_test_test_bot?start={message.from_user.id}')
