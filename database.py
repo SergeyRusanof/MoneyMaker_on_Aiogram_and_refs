@@ -19,12 +19,18 @@ class DataBase:
 
     def count_ref(self, user_id):
         with self.conn:
-            return self.cursor.execute('SELECT COUNT (id) as count FROM refs WHERE user_id=?', (user_id,)).fetchone()[0]
+            result = self.cursor.execute('SELECT * FROM referal WHERE referer_id=?', (user_id,)).fetchall()
+            return len(result)
 
-
-    def add_data_user(self, user_id, user_name, balance, rbalance, btc, eth, trc, bep, income):
+    def all_balance(self, amount):
         with self.conn:
-            result = self.cursor.execute('INSERT INTO users (user_id, user_name, balance, rbalance, btc, eth, trc, bep, income) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)', (user_id, user_name, balance, rbalance, btc, eth, trc, bep, income))
+            result = self.cursor.execute('UPDATE users SET balance=?', (amount,))
+
+
+
+    def add_data_user(self, user_id, user_name, balance, rbalance, income):
+        with self.conn:
+            result = self.cursor.execute('INSERT INTO users (user_id, user_name, balance, rbalance, income) VALUES (?, ?, ?, ?, ?)', (user_id, user_name, balance, rbalance, income))
 
     def profile_data(self, user_id):
         with self.conn:

@@ -9,6 +9,7 @@ from about_as import *
 import random
 from config import TOKEN, ADMIN
 from database import *
+from aiocron import crontab
 
 
 bot = Bot(TOKEN)
@@ -17,7 +18,7 @@ db = DataBase('users.db')
 con = sqlite3.connect('users.db')
 cur = con.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS referal (id INTEGER PRIMARY KEY, user_id INTEGER, referer_id INTEGER)')
-cur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, user_id INTEGER, user_name TEXT, balance INTEGER, rbalance INTEGER, bep TEXT, trc TEXT, eth TEXT, btc TEXT, income INTEGER)")
+cur.execute("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, user_id INTEGER, user_name TEXT, balance INTEGER, rbalance INTEGER, income INTEGER)")
 con.commit()
 photo_start = 'AgACAgEAAxkBAAIQWmWZfMhUvQmOMOef0Xwqmn-uEIrdAALfrDEbY_rRRERg27ZmOrWnAQADAgADeQADNAQ'
 photo_menu = 'AgACAgEAAxkBAAIQVmWZfAgojhO9PE8sTGmGh60_ajBQAALbrDEbY_rRRI6fkVizLFnEAQADAgADeQADNAQ'
@@ -37,11 +38,11 @@ async def start(message: types.Message):
         cur.execute('SELECT user_id FROM referal WHERE user_id = ?', (message.from_user.id,))
         result = cur.fetchone()
         if result is None:
-            db.add_data_user(message.from_user.id, message.from_user.first_name, balance=0, rbalance=0, income=0, btc=0, eth=0, trc=0, bep=0)
+            db.add_data_user(message.from_user.id, message.from_user.first_name, balance=0, rbalance=0, income=0)
             cur.execute('INSERT INTO referal (user_id) VALUES (?)', (message.from_user.id,))
             con.commit()
         if referer_id and referer_id != str(message.from_user.id):
-            is_refers(message, message.from_user.id, referer_id)
+            await is_refers(message, message.from_user.id, referer_id)
             global photo_start
             await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
                                  reply_markup=start_menu)
@@ -52,14 +53,12 @@ async def start(message: types.Message):
             await message.delete()
 
 
-def is_refers(message: types.Message, user_id, referer_id):
+async def is_refers(message: types.Message, user_id, referer_id):
     con = sqlite3.connect('users.db')
     cur = con.cursor()
     cur.execute('UPDATE referal SET referer_id=? WHERE user_id=?', (referer_id, user_id))
     con.commit()
-
-
-
+    await bot.send_message(referer_id, 'Новый реферал перешёл по твоей ссылке!')
 
 
 
@@ -87,7 +86,7 @@ async def calc(message: types.Message):
 @dp.callback_query(F.data == 'down_balance')
 async def balance_down_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=
-                           f'{message.from_user.first_name}, мы командой приняли решение, что будем индивидуально подходить к инвесторам.\nПоэтому для вывода или перевода денег бысрее и надёжнее будет написать администратору.\nАдмину отправляете свой адрес кошелька, сумму и id\nАдмин - @sergeyrusanof')
+                           f'{message.from_user.first_name}, мы командой приняли решение, что будем индивидуально подходить к инвесторам.\n\nПоэтому для вывода или перевода денег бысрее и надёжнее будет написать администратору или в общий чат и тегнуть админа.\n\nOтправляете свой адрес кошелька, сумму и id - админ сверит баланс по id и запрос на вывод, после чего совершит перевод и отправит скрин.\n\nАдмин - @sergeyrusanof')
 
 @dp.callback_query(F.data == 'up_balance')
 async def balance_up_handler(message: types.Message):
@@ -111,19 +110,19 @@ async def refers_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}.\nТы получаешь вознаграждение - 10% от суммы пополнений твоих рефералов.\n\n'
                                                 f'Перешли: {len(count)} реферала.\n\n'
                                                 f'Твой доход от рефки: 0 $\n\n'
-                                                f'Ссылка: https://t.me/lessons_test_test_bot?start={message.from_user.id}')
+                                                f'Ссылка: `https://t.me/lessons_test_test_bot?start={message.from_user.id}`', parse_mode='MARKDOWN')
 
 
 @dp.callback_query(F.data == 'st_profile')
 async def profile_handler(message: types.Message):
     global photo_menu
     data = db.profile_data(message.from_user.id)
-    print(data)
+    count = db.count_ref(message.from_user.id)
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n'
                                                                f'<i>id {message.from_user.id}</i>\n\n'
-                                                               f'<i>Баланс 0 $</i>\n\n'
-                                                               f'<i>Доход за сутки: 0 $</i>\n\n'
-                                                               f'<i>Рефералы: 0 чел. 0 $</i>\n\n'
+                                                               f'<i>Баланс {data[3]} $</i>\n\n'
+                                                               f'<i>Доход за сутки: {data[4]} $</i>\n\n'
+                                                               f'<i>Рефералы: {count} чел. 0 $</i>\n\n'
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
 
 
@@ -149,6 +148,11 @@ async def all_photo(message: types.Message):
 async def adm_handler(message: types.Message):
     if message.from_user.id == ADMIN:
         await bot.send_message(message.from_user.id, 'Привет АДМИН!', reply_markup=for_admin_menu)
+
+
+async def income_every_day() -> None:
+    pass
+
 
 
 async def main():
