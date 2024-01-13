@@ -8,11 +8,12 @@ from menu import *
 from about_as import *
 import random
 from config import TOKEN, ADMIN
+from database import *
 
 
 bot = Bot(TOKEN)
 dp = Dispatcher()
-
+db = DataBase('users.db')
 con = sqlite3.connect('users.db')
 cur = con.cursor()
 cur.execute('CREATE TABLE IF NOT EXISTS referal (id INTEGER PRIMARY KEY, user_id INTEGER, referer_id INTEGER)')
@@ -36,6 +37,7 @@ async def start(message: types.Message):
         cur.execute('SELECT user_id FROM referal WHERE user_id = ?', (message.from_user.id,))
         result = cur.fetchone()
         if result is None:
+            db.add_data_user(message.from_user.id, message.from_user.first_name, balance=0, rbalance=0, income=0, btc=0, eth=0, trc=0, bep=0)
             cur.execute('INSERT INTO referal (user_id) VALUES (?)', (message.from_user.id,))
             con.commit()
         if referer_id and referer_id != str(message.from_user.id):
