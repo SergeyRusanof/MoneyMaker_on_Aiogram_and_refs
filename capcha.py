@@ -5,4 +5,4 @@ def greate_capcha():
     return capcha
 
 def generate_random_number():
-    return random.uniform(0.05, 0.12)
+    return random.uniform(0.5, 1.12)

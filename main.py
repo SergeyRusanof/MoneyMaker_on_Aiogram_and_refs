@@ -125,7 +125,7 @@ async def profile_handler(message: types.Message):
     count = db.count_ref(message.from_user.id)
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n'
                                                                f'<i>id {message.from_user.id}</i>\n\n'
-                                                               f'<i>Баланс {data[3]} $</i>\n\n'
+                                                               f'<i>Баланс {round(data[3], 3)} $</i>\n\n'
                                                                f'<i>Доход за сутки: {data[4]} %</i>\n\n'
                                                                f'<i>Рефералы: {count} чел. 0 $</i>\n\n'
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
@@ -156,7 +156,7 @@ async def adm_handler(message: types.Message):
 
 @dp.callback_query(F.data == 'change_balance')
 async def income_every_day(message: types.Message):
-    amount = generate_random_number()
+    amount = round(generate_random_number(), 3)
     db.all_balance(amount)
     await bot.send_message(ADMIN, f'Баланс увеличен на {amount}')
 
