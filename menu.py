@@ -24,6 +24,9 @@ for_admin_menu = InlineKeyboardMarkup(inline_keyboard=[
     [
         InlineKeyboardButton(text='Участники бота', callback_data='all_users'),
         InlineKeyboardButton(text='Изменить баланс', callback_data='change_balance')
+    ],
+    [
+        InlineKeyboardButton(text='Баланс юзера', callback_data='user_balance')
     ]
 ])
 

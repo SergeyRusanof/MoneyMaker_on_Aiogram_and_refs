@@ -139,7 +139,12 @@ async def about_handler(message: types.Message):
 
 @dp.callback_query(F.data == 'all_users')
 async def all_users_handler(message: types.Message):
-    await bot.send_message(message.from_user.id, 'привет')
+    users = db.users_in_bot()
+    header = f"{'ID':<4} | {'User ID':<12} | {'User Name':<10} | {'Balance':<9} | {'RBalance':<8} | {'Income':<7}"
+    rows = [f"{user[0]:<4} | {user[1]:<12} | {user[2]:<10} | {round(user[3], 3):<9} | {round(user[4], 3):<8} | {round(user[5], 3):<7}" for user in users]
+    message_text = f'{header}\n\n' + '\n'.join(rows)
+    await bot.send_message(message.from_user.id, message_text)
+
 
 @dp.message(F.photo)
 async def all_photo(message: types.Message):
@@ -159,7 +164,6 @@ async def income_every_day(message: types.Message):
     amount = round(generate_random_number(), 3)
     db.all_balance(amount)
     await bot.send_message(ADMIN, f'Баланс увеличен на {amount}')
-
 
 
 async def main():

@@ -27,7 +27,10 @@ class DataBase:
             result = self.cursor.execute('UPDATE users SET balance=balance+?', (amount,))
 
 
-
+    def users_in_bot(self):
+        with self.conn:
+            result = self.cursor.execute('SELECT * FROM users').fetchall()
+            return result
     def add_data_user(self, user_id, user_name, balance, rbalance, income):
         with self.conn:
             result = self.cursor.execute('INSERT INTO users (user_id, user_name, balance, rbalance, income) VALUES (?, ?, ?, ?, ?)', (user_id, user_name, balance, rbalance, income))
