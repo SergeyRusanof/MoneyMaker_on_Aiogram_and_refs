@@ -3,7 +3,7 @@ import sqlite3
 
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.client import bot
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, state
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from menu import *
@@ -11,6 +11,7 @@ from about_as import *
 from capcha import generate_random_number
 from config import TOKEN, ADMIN
 from database import *
+from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 
@@ -34,7 +35,7 @@ calc_photo = 'AgACAgEAAxkBAAIRXmWdSoqYmRmRN3WJq6071mSwQ0GMAAI4rTEb6VXpRHwNodcqk4
 
 
 class IdForAdmin(StatesGroup):
-    catch_id = State()
+    ID = State()
 
 
 @dp.message(CommandStart())
@@ -141,19 +142,14 @@ async def about_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'{text_about_as}', reply_markup=back_menu)
 
 @dp.callback_query(F.data == 'user_balance')
-async def user_balance_handler(message: types.Message):
-    await state.set_state(IdForAdmin.catch_id)
-    await bot.send_message(message.from_user.id, 'Отправь ID юзера')
+async def user_balance_id(message: types.Message, state: FSMContext):
+    await bot.send_message(message.from_user.id, 'Отправь id')
+    await state.set_state(IdForAdmin.ID)
 
-@dp.message(IdForAdmin.catch_id)
-async def catch_id(message: types.Message, state: FSMContext):
-    await state.update_data(user_id=message.from_user)
-    data = await state.get_data()
-    await state.clear()
-    print(data)
-
-
-
+@dp.message(IdForAdmin.ID)
+async def get_id(message: types.Message, state: FSMContext):
+    await state.update_data(ID=message.text)
+    await bot.send_message(message.from_user.id, f'{message.text}')
 
 @dp.callback_query(F.data == 'all_users')
 async def all_users_handler(message: types.Message):
