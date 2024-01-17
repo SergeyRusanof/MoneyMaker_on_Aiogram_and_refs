@@ -26,6 +26,10 @@ class DataBase:
         with self.conn:
             result = self.cursor.execute('UPDATE users SET balance=balance+?', (amount,))
 
+    def income_day(self, amount):
+        with self.conn:
+            result = self.cursor.execute('UPDATE users SET income=?', (amount,))
+
 
     def users_in_bot(self):
         with self.conn:

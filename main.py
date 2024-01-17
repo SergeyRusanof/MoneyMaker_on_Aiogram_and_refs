@@ -132,7 +132,7 @@ async def profile_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n'
                                                                f'<i>id {message.from_user.id}</i>\n\n'
                                                                f'<i>Баланс {round(data[3], 3)} $</i>\n\n'
-                                                               f'<i>Доход за сутки: {data[4]} %</i>\n\n'
+                                                               f'<i>Доход за сутки: {data[5]} %</i>\n\n'
                                                                f'<i>Рефералы: {count} чел. 0 $</i>\n\n'
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
 
@@ -159,8 +159,6 @@ async def get_amount(message: types.Message, state: FSMContext):
     date = await state.get_data()
     user_id = date.get('ID')
     amount_up = date.get('AMOUNT')
-    print(user_id)
-    print(amount_up)
     db.up_balance(user_id, amount_up)
     await bot.send_message(message.from_user.id, f'Баланс пользователя {user_id} пополнен на сумму {amount_up} $')
     await state.clear()
@@ -192,6 +190,7 @@ async def adm_handler(message: types.Message):
 async def income_every_day(message: types.Message):
     amount = round(generate_random_number(), 3)
     db.all_balance(amount)
+    db.income_day(amount)
     await bot.send_message(ADMIN, f'Баланс увеличен на {amount}')
 
 
