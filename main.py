@@ -36,6 +36,7 @@ calc_photo = 'AgACAgEAAxkBAAIRXmWdSoqYmRmRN3WJq6071mSwQ0GMAAI4rTEb6VXpRHwNodcqk4
 
 class IdForAdmin(StatesGroup):
     ID = State()
+    AMOUNT = State()
 
 
 @dp.message(CommandStart())
@@ -143,13 +144,27 @@ async def about_handler(message: types.Message):
 
 @dp.callback_query(F.data == 'user_balance')
 async def user_balance_id(message: types.Message, state: FSMContext):
-    await bot.send_message(message.from_user.id, 'Отправь id')
+    await bot.send_message(message.from_user.id, 'Отправь id юзера')
     await state.set_state(IdForAdmin.ID)
 
 @dp.message(IdForAdmin.ID)
 async def get_id(message: types.Message, state: FSMContext):
     await state.update_data(ID=message.text)
-    await bot.send_message(message.from_user.id, f'{message.text}')
+    await bot.send_message(message.from_user.id, f'Юзер с ID {message.text} найден!\n\nВведите сумму пополнения:', )
+    await state.set_state(IdForAdmin.AMOUNT)
+
+@dp.message(IdForAdmin.AMOUNT)
+async def get_amount(message: types.Message, state: FSMContext):
+    await state.update_data(AMOUNT=message.text)
+    date = await state.get_data()
+    user_id = date.get('ID')
+    amount_up = date.get('AMOUNT')
+    print(user_id)
+    print(amount_up)
+    db.up_balance(user_id, amount_up)
+    await bot.send_message(message.from_user.id, f'Баланс пользователя {user_id} пополнен на сумму {amount_up} $')
+    await state.clear()
+
 
 @dp.callback_query(F.data == 'all_users')
 async def all_users_handler(message: types.Message):
