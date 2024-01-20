@@ -7,7 +7,7 @@ class DataBase:
 
     def check_id(self, user_id):
         with self.conn:
-            result = self.cursor.execute('SELECT * FROM refs WHERE user_id=?', (user_id,)).fetchall()
+            result = self.cursor.execute('SELECT * FROM referal WHERE user_id=?', (user_id,)).fetchall()
             return bool(len(result))
 
     def add_user(self, user_id, referer_id=None):
@@ -52,3 +52,8 @@ class DataBase:
         with self.conn:
             result = self.cursor.execute('SELECT * FROM users WHERE user_id=?', (user_id, )).fetchall()
             return result
+
+    def is_refer(self, user_id):
+        with self.conn:
+            result = self.cursor.execute('SELECT referer_id FROM referal WHERE user_id=?', (user_id,)).fetchall()
+            return bool(result)
