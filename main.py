@@ -9,6 +9,7 @@ from about_as import *
 from capcha import generate_random_number
 from config import TOKEN, ADMIN
 from database import *
+from capcha import greate_capcha
 
 
 
@@ -36,8 +37,14 @@ class IdForAdmin(StatesGroup):
     AMOUNT = State()
 
 
+class AreYouBot(StatesGroup):
+    answer = State()
+
+
 @dp.message(CommandStart())
 async def start(message: types.Message):
+    capcha: int = greate_capcha()
+    await bot.send_message(message.from_user.id, f'Пройди купчу: \nОтправь в чат это число - {capcha}')
     if message.chat.type == 'private':
         check_id = message.text[7:]
         referer_id = str(check_id)
