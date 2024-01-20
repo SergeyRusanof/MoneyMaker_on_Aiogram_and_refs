@@ -1,9 +1,7 @@
 import asyncio
-import sqlite3
-
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.client import bot
-from aiogram.filters import CommandStart, state
+from aiogram.filters import CommandStart
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from menu import *
@@ -11,7 +9,6 @@ from about_as import *
 from capcha import generate_random_number
 from config import TOKEN, ADMIN
 from database import *
-from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 
@@ -55,11 +52,11 @@ async def start(message: types.Message):
         if referer_id and referer_id != str(message.from_user.id):
             await is_refers(message, message.from_user.id, referer_id)
             global photo_start
-            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
+            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/m_m_trade\nЧат: \nhttps://t.me/moneymtrade',
                                  reply_markup=start_menu)
             await message.delete()
         else:
-            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/+EytmwokoIjhkZGQx\nЧат: \nhttps://t.me/moneymtrade',
+            await bot.send_photo(message.from_user.id, photo_start, caption=f'Приветствуем тебя {message.from_user.first_name} в нашем инвестиционном боте!\n\nЕсли ещё не подписан, то подпишись:\n\nНаш канал: \nhttps://t.me/m_m_trade\nЧат: \nhttps://t.me/moneymtrade',
                                  reply_markup=start_menu)
             await message.delete()
 
@@ -137,7 +134,6 @@ async def profile_handler(message: types.Message):
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
 
 
-
 @dp.callback_query(F.data == 'about')
 async def about_handler(message: types.Message):
     await bot.send_photo(message.from_user.id, photo_menu, caption=f'{text_about_as}', reply_markup=back_menu)
@@ -150,6 +146,7 @@ async def user_balance_id(message: types.Message, state: FSMContext):
 @dp.message(IdForAdmin.ID)
 async def get_id(message: types.Message, state: FSMContext):
     await state.update_data(ID=message.text)
+    db.chek_id_adm(message.text)
     await bot.send_message(message.from_user.id, f'Юзер с ID {message.text} найден!\n\nВведите сумму пополнения:', )
     await state.set_state(IdForAdmin.AMOUNT)
 
@@ -162,6 +159,7 @@ async def get_amount(message: types.Message, state: FSMContext):
     db.up_balance(user_id, amount_up)
     await bot.send_message(message.from_user.id, f'Баланс пользователя {user_id} пополнен на сумму {amount_up} $')
     await state.clear()
+
 
 
 @dp.callback_query(F.data == 'all_users')
@@ -178,7 +176,6 @@ async def all_photo(message: types.Message):
     id = message.photo[-1].file_id
     print(id)
     await bot.send_message(message.from_user.id, 'Спасибо!')
-
 
 
 @dp.message(F.text == '/adm')

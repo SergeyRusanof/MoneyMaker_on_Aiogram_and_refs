@@ -47,3 +47,8 @@ class DataBase:
     def up_balance(self, user_id, amount_up):
         with self.conn:
             result = self.cursor.execute('UPDATE users SET balance=? WHERE user_id=?', (amount_up, user_id))
+
+    def chek_id_adm(self, user_id):
+        with self.conn:
+            result = self.cursor.execute('SELECT * FROM users WHERE user_id=?', (user_id, )).fetchall()
+            return result
