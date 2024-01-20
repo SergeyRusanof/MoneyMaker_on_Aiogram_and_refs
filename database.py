@@ -55,5 +55,9 @@ class DataBase:
 
     def is_refer(self, user_id):
         with self.conn:
-            result = self.cursor.execute('SELECT referer_id FROM referal WHERE user_id=?', (user_id,)).fetchall()
-            return bool(result)
+            result = self.cursor.execute('SELECT referer_id FROM referal WHERE user_id=?', (user_id,)).fetchone()
+            return result
+
+    def refs_bonus(self, user_id, bonus):
+        with self.conn:
+            result = self.cursor.execute('UPDATE users SET rbalance=rbalance+bonus WHERE user_id=?', (user_id, bonus))

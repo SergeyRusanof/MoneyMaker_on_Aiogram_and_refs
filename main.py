@@ -157,7 +157,12 @@ async def get_amount(message: types.Message, state: FSMContext):
     user_id = date.get('ID')
     amount_up = date.get('AMOUNT')
     db.up_balance(user_id, amount_up)
-    await bot.send_message(message.from_user.id, f'Баланс пользователя {user_id} пополнен на сумму {amount_up} $')
+    bonus = (amount_up * 10) / 100
+    referer = db.is_refer(user_id)
+    if referer:
+        await bot.send_message(message.from_user.id, f'Есть реферер у этого пользователя!\nЕго реферер {referer[0]} \nБаланс юзера {user_id} пополнен на {amount_up}')
+    else:
+        await bot.send_message(message.from_user.id, f'Баланс пользователя {user_id} пополнен на сумму {amount_up} $')
     await state.clear()
 
 
