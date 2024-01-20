@@ -76,19 +76,19 @@ async def calc(message: types.Message):
 
 @dp.callback_query(F.data == '10_7')
 async def calc(message: types.Message):
-    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 7 дней составит: 14,5$', reply_markup=start_menu)
+    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 7 дней составит: 14,5$ от депозита 10$', reply_markup=start_menu)
 
 @dp.callback_query(F.data == '50_14')
 async def calc(message: types.Message):
-    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 14 дней составит: 74$', reply_markup=start_menu)
+    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 14 дней составит: 74$ от депозита 50$', reply_markup=start_menu)
 
 @dp.callback_query(F.data == '100_7')
 async def calc(message: types.Message):
-    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 7 дней составит: 145$', reply_markup=start_menu)
+    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 7 дней составит: 145$ от депозита 100$', reply_markup=start_menu)
 
 @dp.callback_query(F.data == '500_14')
 async def calc(message: types.Message):
-    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 14 дней составит: 1450$', reply_markup=start_menu)
+    await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 14 дней составит: 1450$ от депозита 500$', reply_markup=start_menu)
 
 
 @dp.callback_query(F.data == 'down_balance')
@@ -115,9 +115,10 @@ async def refers_handler(message: types.Message):
     cur = con.cursor()
     cur.execute('SELECT * FROM referal WHERE referer_id=?', (message.from_user.id,))
     count = cur.fetchall()
-    await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}.\nТы получаешь вознаграждение - 10% от суммы пополнений твоих рефералов.\n\n'
+    data = db.profile_data(message.from_user.id)
+    await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}.\nТы получаешь вознаграждение - 5% от суммы пополнений твоих рефералов.\n\n'
                                                 f'Перешли: {len(count)} реферала.\n\n'
-                                                f'Твой доход от рефки: 0 $\n\n'
+                                                f'Твой доход от рефки: {data[4]} $\n\n'
                                                 f'Ссылка: `https://t.me/lessons_test_test_bot?start={message.from_user.id}`', parse_mode='MARKDOWN')
 
 
@@ -130,7 +131,7 @@ async def profile_handler(message: types.Message):
                                                                f'<i>id {message.from_user.id}</i>\n\n'
                                                                f'<i>Баланс {round(data[3], 3)} $</i>\n\n'
                                                                f'<i>Доход за сутки: {data[5]} %</i>\n\n'
-                                                               f'<i>Рефералы: {count} чел. 0 $</i>\n\n'
+                                                               f'<i>Рефералы: {count} чел. {data[4]} $</i>\n\n'
                                                                f'<i>Доход за всё время в проекте: 0 $</i>', parse_mode='HTML', reply_markup=profil_menu)
 
 
@@ -157,12 +158,14 @@ async def get_amount(message: types.Message, state: FSMContext):
     user_id = date.get('ID')
     amount_up = date.get('AMOUNT')
     db.up_balance(user_id, amount_up)
-    bonus = (amount_up * 10) / 100
+    bonus = (int(amount_up)*5)/100
     referer = db.is_refer(user_id)
     if referer:
-        await bot.send_message(message.from_user.id, f'Есть реферер у этого пользователя!\nЕго реферер {referer[0]} \nБаланс юзера {user_id} пополнен на {amount_up}')
+        await bot.send_message(message.from_user.id, f'Есть реферер у этого пользователя!\nЕго реферер {referer[0]} \nБаланс юзера {user_id} пополнен на {amount_up}$\nРефереру начислен бонус - {bonus}$')
+        db.refs_bonus(referer[0], bonus)
+        await bot.send_message(referer[0], f'Тебе начислен бонус {bonus}$\nПополнения баланса пользователя {user_id} на {amount_up}$')
     else:
-        await bot.send_message(message.from_user.id, f'Баланс пользователя {user_id} пополнен на сумму {amount_up} $')
+        await bot.send_message(message.from_user.id, f'Нет рефереров!\nБаланс пользователя {user_id} пополнен на сумму {amount_up}$')
     await state.clear()
 
 

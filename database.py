@@ -60,4 +60,5 @@ class DataBase:
 
     def refs_bonus(self, user_id, bonus):
         with self.conn:
-            result = self.cursor.execute('UPDATE users SET rbalance=rbalance+bonus WHERE user_id=?', (user_id, bonus))
+            result = self.cursor.execute('UPDATE users SET rbalance=rbalance+? WHERE user_id=?', (bonus, user_id))
+            self.conn.commit()
