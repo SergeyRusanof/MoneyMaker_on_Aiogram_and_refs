@@ -184,6 +184,9 @@ async def all_photo(message: types.Message):
     print(id)
     await bot.send_message(message.from_user.id, 'Спасибо!')
 
+@dp.message()
+async def ampty_message(message: types.Message):
+    await bot.send_message(message.from_user.id, 'Спасибо! Но для связи пиши админу бота @sergeyrusanof')
 
 @dp.message(F.text == '/adm')
 async def adm_handler(message: types.Message):
