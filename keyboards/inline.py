@@ -48,4 +48,3 @@ calc_menu = InlineKeyboardMarkup(inline_keyboard=[
     ]
 ])
 
-

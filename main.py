@@ -1,15 +1,14 @@
 import asyncio
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.client import bot
-from aiogram.filters import CommandStart
+from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
-from menu import *
+from keyboards.inline import *
 from about_as import *
-from capcha import generate_random_number
-from config import TOKEN, ADMIN
-from database import *
-from capcha import greate_capcha
+from utils.capcha import generate_random_number
+from utils.configure import TOKEN, ADMIN
+from data.database import *
 
 
 
@@ -43,8 +42,6 @@ class AreYouBot(StatesGroup):
 
 @dp.message(CommandStart())
 async def start(message: types.Message):
-    capcha: int = greate_capcha()
-    await bot.send_message(message.from_user.id, f'Пройди купчу: \nОтправь в чат это число - {capcha}')
     if message.chat.type == 'private':
         check_id = message.text[7:]
         referer_id = str(check_id)
@@ -68,14 +65,13 @@ async def start(message: types.Message):
             await message.delete()
 
 
+
 async def is_refers(message: types.Message, user_id, referer_id):
     con = sqlite3.connect('users.db')
     cur = con.cursor()
     cur.execute('UPDATE referal SET referer_id=? WHERE user_id=?', (referer_id, user_id))
     con.commit()
     await bot.send_message(referer_id, 'Новый реферал перешёл по твоей ссылке!')
-
-
 
 @dp.callback_query(F.data == 'calc')
 async def calc(message: types.Message):
@@ -96,6 +92,7 @@ async def calc(message: types.Message):
 @dp.callback_query(F.data == '500_14')
 async def calc(message: types.Message):
     await bot.send_photo(message.from_user.id, calc_photo, caption='Ваш доход за 14 дней составит: 1450$ от депозита 500$', reply_markup=start_menu)
+
 
 
 @dp.callback_query(F.data == 'down_balance')
@@ -134,8 +131,8 @@ async def profile_handler(message: types.Message):
     global photo_menu
     data = db.profile_data(message.from_user.id)
     count = db.count_ref(message.from_user.id)
-    await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n'
-                                                               f'<i>id {message.from_user.id}</i>\n\n'
+    await bot.send_photo(message.from_user.id, photo_menu, caption=f'Привет, {message.from_user.first_name}. Ты в своём профиле..\n\n'
+                                                               f'<i>id {message.from_user.id} - для снятия, пополнения и др.</i>\n\n'
                                                                f'<i>Баланс {round(data[3], 3)+data[4]} $</i>\n\n'
                                                                f'<i>Доход за сутки: {data[5]} %</i>\n\n'
                                                                f'<i>Рефералы: {count} чел. {data[4]} $</i>\n\n', parse_mode='HTML', reply_markup=profil_menu)
@@ -191,9 +188,6 @@ async def all_photo(message: types.Message):
     print(id)
     await bot.send_message(message.from_user.id, 'Спасибо!')
 
-@dp.message()
-async def ampty_message(message: types.Message):
-    await bot.send_message(message.from_user.id, 'Спасибо! Но для связи пиши админу бота @sergeyrusanof')
 
 @dp.message(F.text == '/adm')
 async def adm_handler(message: types.Message):
@@ -206,6 +200,11 @@ async def income_every_day(message: types.Message):
     db.all_balance(amount)
     db.income_day(amount)
     await bot.send_message(ADMIN, f'Баланс увеличен на {amount}')
+
+
+@dp.message()
+async def ampty_message(message: types.Message):
+    await bot.send_message(message.from_user.id, 'Спасибо! Но для связи пиши админу бота @sergeyrusanof')
 
 
 async def main():
